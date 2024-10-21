@@ -5,11 +5,12 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using BookStore.API.Data;
-using BookStore.API.DTO.Author;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using BookStore.API.Static;
+using BookStore.API.Data.DTOs;
+using BookStore.API.Data.Models;
+using BookStore.API.Data.Contexts;
 
 namespace BookStore.API.Controllers
 {
@@ -23,19 +24,20 @@ namespace BookStore.API.Controllers
         public AuthorsController(BookStoreDbContext context, ILogger<AuthorsController> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         // GET: api/Authors
         [HttpGet]
         public async Task<ActionResult<IEnumerable<AuthorDTO>>> GetAuthors()
         {
-            throw new Exception("Test");
-            _logger.LogInformation($"Request to {nameof(GetAuthors)}");            
+            _logger.LogInformation($"GET request made to {nameof(GetAuthors)}");
             try
             {
                 var authors = await _context.Authors.ToListAsync();
                 var authorsDTO = authors.Select(a => new AuthorDTO
                 {
+                    Id = a.Id,
                     FirstName = a.FirstName ?? string.Empty,
                     LastName = a.LastName ?? string.Empty,
                     Bio = a.Bio ?? string.Empty
@@ -54,10 +56,10 @@ namespace BookStore.API.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<AuthorDTO>> GetAuthor(int id)
         {
+            _logger.LogInformation($"GET request made to {nameof(GetAuthor)}");
             try
             {
                 var author = await _context.Authors.FindAsync(id);
-
                 if (author == null)
                 {
                     _logger.LogWarning($"Record not found: {nameof(GetAuthor)} - ID: {id}");
@@ -84,8 +86,9 @@ namespace BookStore.API.Controllers
         // PUT: api/Authors/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutAuthor(int id, Author authorDTO)
+        public async Task<IActionResult> PutAuthor(int id, AuthorDTO authorDTO)
         {
+            _logger.LogInformation($"PUT request made to {nameof(PutAuthor)}");
             if (id != authorDTO.Id)
             {
                 _logger.LogWarning($"Update ID is invalid in {nameof(PutAuthor)} - ID: {id}");
@@ -96,7 +99,7 @@ namespace BookStore.API.Controllers
 
             if (author == null)
             {
-                _logger.LogWarning($"{nameof(Author)} record not found in {nameof(PutAuthor)} - ID: {id}");
+                _logger.LogWarning($"{nameof(AuthorModel)} record not found in {nameof(PutAuthor)} - ID: {id}");
                 return NotFound();
             }
 
@@ -131,9 +134,10 @@ namespace BookStore.API.Controllers
         [HttpPost]
         public async Task<ActionResult<AuthorDTO>> PostAuthor(AuthorDTO authorDTO)
         {
+            _logger.LogInformation($"POST request made to {nameof(PostAuthor)}");
             try
             {
-                var author = new Author
+                var author = new AuthorModel
                 {
                     FirstName = authorDTO.FirstName,
                     LastName = authorDTO.LastName,
@@ -156,6 +160,7 @@ namespace BookStore.API.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteAuthor(int id)
         {
+            _logger.LogInformation($"DELETE request made to {nameof(DeleteAuthor)}");
             try
             {
                 var author = await _context.Authors.FindAsync(id);

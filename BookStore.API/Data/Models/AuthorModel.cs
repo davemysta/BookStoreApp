@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace BookStore.API.Data;
+namespace BookStore.API.Data.Models;
 
-public partial class Author
+public partial class AuthorModel
 {
     public int Id { get; set; }
 
@@ -13,5 +13,5 @@ public partial class Author
 
     public string? Bio { get; set; }
 
-    public virtual ICollection<Book> Books { get; set; } = new List<Book>();
+    public virtual ICollection<BookModel> Books { get; set; } = new List<BookModel>();
 }

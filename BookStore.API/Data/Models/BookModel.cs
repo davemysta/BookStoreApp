@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace BookStore.API.Data;
+namespace BookStore.API.Data.Models;
 
-public partial class Book
+public partial class BookModel
 {
     public int Id { get; set; }
 
@@ -17,9 +17,9 @@ public partial class Book
 
     public string? Image { get; set; }
 
-    public decimal? Price { get; set; }
+    public decimal Price { get; set; }
 
     public int? AuthorId { get; set; }
 
-    public virtual Author? Author { get; set; }
+    public virtual AuthorModel? Author { get; set; }
 }

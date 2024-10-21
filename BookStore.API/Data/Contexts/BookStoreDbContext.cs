@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using BookStore.API.Data.Models;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
-namespace BookStore.API.Data;
+namespace BookStore.API.Data.Contexts;
 
-public partial class BookStoreDbContext : DbContext
+public partial class BookStoreDbContext : IdentityDbContext<ApiUser>
 {
     public BookStoreDbContext()
     {
@@ -15,13 +17,15 @@ public partial class BookStoreDbContext : DbContext
     {
     }
 
-    public virtual DbSet<Author> Authors { get; set; }
+    public virtual DbSet<AuthorModel> Authors { get; set; }
 
-    public virtual DbSet<Book> Books { get; set; }
-        
+    public virtual DbSet<BookModel> Books { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<Author>(entity =>
+        base.OnModelCreating(modelBuilder);
+
+        modelBuilder.Entity<AuthorModel>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PK__Authors__3214EC07123489B8");
 
@@ -36,7 +40,7 @@ public partial class BookStoreDbContext : DbContext
                 .IsFixedLength();
         });
 
-        modelBuilder.Entity<Book>(entity =>
+        modelBuilder.Entity<BookModel>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PK__Books__3214EC0756F8D4B0");
 

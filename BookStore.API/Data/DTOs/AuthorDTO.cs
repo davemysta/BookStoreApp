@@ -1,7 +1,7 @@
 ﻿using BookStore.API.Data;
 using System.ComponentModel.DataAnnotations;
 
-namespace BookStore.API.DTO.Author
+namespace BookStore.API.Data.DTOs
 {
     public class AuthorDTO
     {
