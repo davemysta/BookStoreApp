@@ -11,11 +11,13 @@ using BookStore.API.Static;
 using BookStore.API.Data.DTOs;
 using BookStore.API.Data.Models;
 using BookStore.API.Data.Contexts;
+using Microsoft.AspNetCore.Authorization;
 
 namespace BookStore.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class AuthorsController : ControllerBase
     {
         private readonly BookStoreDbContext _context;
@@ -86,6 +88,7 @@ namespace BookStore.API.Controllers
         // PUT: api/Authors/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> PutAuthor(int id, AuthorDTO authorDTO)
         {
             _logger.LogInformation($"PUT request made to {nameof(PutAuthor)}");
@@ -132,6 +135,7 @@ namespace BookStore.API.Controllers
         // POST: api/Authors
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
+        [Authorize(Roles = "Administrator")]
         public async Task<ActionResult<AuthorDTO>> PostAuthor(AuthorDTO authorDTO)
         {
             _logger.LogInformation($"POST request made to {nameof(PostAuthor)}");
@@ -158,6 +162,7 @@ namespace BookStore.API.Controllers
 
         // DELETE: api/Authors/5
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> DeleteAuthor(int id)
         {
             _logger.LogInformation($"DELETE request made to {nameof(DeleteAuthor)}");

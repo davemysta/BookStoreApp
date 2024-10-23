@@ -10,12 +10,14 @@ using BookStore.API.Data.DTOs;
 using BookStore.API.Data.DTOs.BookDTOs;
 using BookStore.API.Data.Contexts;
 using BookStore.API.Static;
+using Microsoft.AspNetCore.Authorization;
 
 
 namespace BookStore.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class BooksController : ControllerBase
     {
         private readonly BookStoreDbContext _context;
@@ -92,6 +94,7 @@ namespace BookStore.API.Controllers
         // PUT: api/Books/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> PutBook(int id, BookDTO bookDTO)
         {
             _logger.LogInformation($"PUT request made to {nameof(PutBook)}");
@@ -142,6 +145,7 @@ namespace BookStore.API.Controllers
         // POST: api/Books
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
+        [Authorize(Roles = "Administrator")]
         public async Task<ActionResult<BookDTO>> PostBook(BookDTO bookDTO)
         {
             _logger.LogInformation($"POST request made to {nameof(PostBook)}");
@@ -172,6 +176,7 @@ namespace BookStore.API.Controllers
 
         // DELETE: api/Books/5
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> DeleteBook(int id)
         {
             _logger.LogInformation($"DELETE request made to {nameof(DeleteBook)}");
