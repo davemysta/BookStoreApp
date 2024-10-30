@@ -1,0 +1,57 @@
+﻿@page "/books/details/{id:int}"
+@inject IBookService _bookService
+@inject IAuthorService _authorService
+@inject NavigationManager _navManager
+
+<h3>Book Details</h3>
+
+<img src="@Book.ImageData" class="img-thumbnail" width="100" height="100" />
+<dl>
+    <dt>Title</dt>
+    <dd>@Book.Title</dd>
+    <dt>Year</dt>
+    <dd>@Book.Year</dd>
+    <dt>Price</dt>
+    <dd>$@Book.Price</dd>
+    <dt>ISBN</dt>
+    <dd>@Book.Isbn</dd>
+    <dt>Summary</dt>
+    <dd>@Book.Summary</dd>
+    <dt>Author</dt>
+    <dd>@Book.AuthorName</dd>
+</dl>
+
+<button class="btn btn-outline-secondary" @onclick="BackToList">
+    <i class="bi bi-media-skip-backward"></i> Back to List
+</button>
+<AuthorizeView Roles="@Roles.Administrator">
+    <button class="btn btn-warning" aria-hidden="true" @onclick="GoToEdit">Edit</button>
+</AuthorizeView>
+
+
+@code {
+    [Parameter]
+    public int id { get; set; }
+    private BookDTO Book = new();
+
+    protected async override Task OnInitializedAsync()
+    {
+        var bookResponse = await _bookService.GetBook(id);
+
+        if(bookResponse.Success == true)
+        {
+            Book = bookResponse.Data;
+        }
+
+    }
+
+    private void BackToList()
+    {
+        _navManager.NavigateTo("/books/");
+    }
+
+    private void GoToEdit()
+    {
+        _navManager.NavigateTo($"/books/edit/{id}");
+    }
+}

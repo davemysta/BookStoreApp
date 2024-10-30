@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BookStore.API", "BookStore.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BookStore.Blazor.Server", "BookStore.Blazor.Server\BookStore.Blazor.Server.csproj", "{05FD7774-5342-4BE4-B14E-59A36718ADBE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BookStore.Blazor.Wasm", "BookStore.Blazor.Wasm\BookStore.Blazor.Wasm.csproj", "{3EC2FEC7-26F4-4A62-96C5-1D4CB460B525}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{05FD7774-5342-4BE4-B14E-59A36718ADBE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{05FD7774-5342-4BE4-B14E-59A36718ADBE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{05FD7774-5342-4BE4-B14E-59A36718ADBE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3EC2FEC7-26F4-4A62-96C5-1D4CB460B525}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3EC2FEC7-26F4-4A62-96C5-1D4CB460B525}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3EC2FEC7-26F4-4A62-96C5-1D4CB460B525}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3EC2FEC7-26F4-4A62-96C5-1D4CB460B525}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,0 +1,87 @@
+﻿@page "/books/"
+@inject IBookService _bookService
+@inject IJSRuntime js
+
+<h3>Books List</h3>
+
+@if (response.Success == false)
+{
+    <div class="alert alert-danger">
+        <h4>@response.Message</h4>
+    </div>
+}
+else
+{
+    @if (Books == null)
+    {
+        <div class="alert alert-info">
+            <h4>Loading...</h4>
+        </div>
+    }
+    else
+    {
+        <AuthorizeView Roles="Administrator">
+            <a class="btn btn-primary" href="/books/create"><span class="bi bi-plus" aria-hidden="true"></span> Create Books</a>
+        </AuthorizeView>
+        <br />
+        <table class="table table-responsive">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>Title</th>
+                    <th>Price</th>
+                    <th>Author Name</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var book in Books)
+                {
+                    <tr>
+                        <td>
+                            <img src="@book.Image" width="100" height="100" alt="@book.Title" />
+                        </td>
+                        <td>@book.Title</td>
+                        <td>$@book.Price</td>
+                                    <td><a href="/authors/details/@book.AuthorId">@book.AuthorName</a></td>
+                        <td>
+                            <a class="btn btn-primary" aria-hidden="true" href="/books/details/@book.Id">Details</a>
+                            <AuthorizeView Roles="@Roles.Administrator">
+                                <a class="btn btn-warning" aria-hidden="true" href="/books/edit/@book.Id">Edit</a>
+                                <button class="btn btn-danger" @onclick="@(() => Delete(book.Id))" aria-hidden="true">Delete</button>
+                            </AuthorizeView>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+}
+
+
+
+@code {
+    private List<BookListItemDTO> Books;
+    private Response<List<BookListItemDTO>> response = new Response<List<BookListItemDTO>> { Success = true };
+
+    protected override async Task OnInitializedAsync()
+    {
+        response = await _bookService.GetBooks();
+        if (response.Success)
+        {
+            Books = response.Data;
+        }
+    }
+
+    private async Task Delete(int id)
+    {
+        var book = Books.First(q => q.Id == id);
+        var confirm = await js.InvokeAsync<bool>("confirm", $"Are you sure you want to delete {book.Title}?");
+        if (confirm == true)
+        {
+            var response = await _bookService.DeleteBook(id);
+            if (response.Success)
+                await OnInitializedAsync();
+        }
+    }
+}

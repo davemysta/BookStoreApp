@@ -1,0 +1,64 @@
+﻿@page "/users/login"
+@inject IAuthenticationService _authService
+@inject NavigationManager _navManager
+@inject ILogger<Register> _logger
+
+<h3>Login</h3>
+
+@if (string.IsNullOrEmpty(message) == false)
+{
+    <div class="alert alert-danger">
+        <p>@message</p>
+    </div>
+}
+
+<div>
+    <EditForm Model="LoginModel" OnValidSubmit="HandleLogin" FormName="LoginForm">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+        <div class="form-group">
+            <label>
+                Email Address
+                <InputText class="form-control" @bind-Value="LoginModel.Email" />
+                <ValidationMessage For="@(() => LoginModel.Email)" />
+            </label>
+        </div>
+        <br />               
+        <div class="form-group">
+            <label>
+                Password
+                <InputText type="password" class="form-control" @bind-Value="LoginModel.Password" />
+                <ValidationMessage For="@(() => LoginModel.Password)" />
+            </label>
+        </div>
+        <br />
+        <button type="submit" class="btn btn-primary btn-block">Login</button>
+    </EditForm>
+</div>
+
+@code {
+    LoginUserDTO LoginModel = new LoginUserDTO();
+    string message = string.Empty;
+
+    private async Task HandleLogin()
+    {
+        try
+        {
+            var response = await _authService.AuthenticateAsync(LoginModel);
+
+            if (response)
+                _navManager.NavigateTo("/");
+
+            message = "Invalid credentials, please try again.";            
+        }
+        catch (ApiException ex)
+        {
+            if (ex.StatusCode >= 200 && ex.StatusCode <= 299)
+            {
+                _navManager.NavigateTo("/");
+            }
+
+            message = ex.Response;
+        }
+    }
+}

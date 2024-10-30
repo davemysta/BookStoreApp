@@ -1,0 +1,55 @@
+﻿@page "/authors/details/{id:int}"
+@inject IAuthorService _authorService
+@inject NavigationManager _navManager
+
+<h3>Author Details</h3>
+
+<dl>
+    <dt>Name</dt>
+    <dd>@Author.FirstName @Author.LastName</dd>
+    <dt>Biography</dt>
+    <dd>@Author.Bio</dd>
+    <dt>Books</dt>
+    @if (books != null)
+    {
+        <div class="d-flex">
+            @foreach (var book in books)
+            {
+                <dd class="card mx-2">
+                    <img width="200" height="200" src="@book.Image" class="card-img-top" alt="@book.Title">
+                    <div class="card-body">
+                        <h5 class="card-title">@book.Title</h5>
+                        <a href="/books/@book.Id" class="btn btn-primary">See book</a>
+                    </div>
+                </dd>
+            }
+        </div>
+    }    
+</dl>
+
+<button class="btn btn-outline-secondary" @onclick="BackToList">
+    <i class="bi bi-media-skip-backward"></i> Back to List
+</button>
+
+        @code {
+        [Parameter]
+        public int id { get; set; }
+        private AuthorDTO Author = new AuthorDTO();
+        private List<BookListItemDTO> books;
+
+        protected async override Task OnInitializedAsync()
+        {
+            var result = await _authorService.GetAuthor(id);
+
+            if (result != null)
+            {
+                Author = result.Data;
+                books = result.Data.Books.ToList();
+            }            
+    }
+
+    private void BackToList()
+    {
+        _navManager.NavigateTo("/authors/");
+    }
+}
