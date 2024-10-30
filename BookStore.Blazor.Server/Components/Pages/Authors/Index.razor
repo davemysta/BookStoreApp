@@ -1,0 +1,82 @@
+﻿@page "/authors/"
+@using Microsoft.AspNetCore.Components.Authorization
+@inject IAuthorService _authorService
+@inject IJSRuntime js
+
+<h3>Authors List</h3>
+
+@if(response.Success == false)
+{
+    <div class="alert alert-danger">
+        <h4>@response.Message</h4>
+    </div>
+}
+else
+{
+    @if (Authors == null)
+    {
+        <div class="alert alert-info">
+            <h4>Loading...</h4>
+        </div>
+    }
+    else
+    {
+        <AuthorizeView Roles="Administrator">
+            <a class="btn btn-primary" href="/authors/create"><span class="bi bi-plus" aria-hidden="true"></span> Create Authors</a>
+        </AuthorizeView>
+        <br />
+        <table class="table table-responsive">
+            <thead>
+                <tr>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var author in Authors)
+                {
+                    <tr>
+                        <td>@author.FirstName</td>
+                        <td>@author.LastName</td>
+                        <td>
+                            <a class="btn btn-primary" aria-hidden="true" href="/authors/details/@author.Id">Details</a>
+                            <AuthorizeView Roles="@Roles.Administrator">
+                                <a class="btn btn-warning" aria-hidden="true" href="/authors/edit/@author.Id">Edit</a>
+                                <button class="btn btn-danger" @onclick="@(() => Delete(author.Id))" aria-hidden="true">Delete</button>
+                            </AuthorizeView>                            
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+}
+
+
+
+@code {
+    private List<AuthorDTO> Authors;
+    private Response<List<AuthorDTO>> response = new Response<List<AuthorDTO>>{Success = true};
+
+    protected override async Task OnInitializedAsync()
+    {
+        response = await _authorService.GetAuthors();
+        if(response.Success)
+        {
+            Authors = response.Data;
+        }
+    }
+
+    private async Task Delete(int id)
+    {
+        var author = Authors.First(q => q.Id == id);
+        var confirm = await js.InvokeAsync<bool>("confirm", $"Are you sure you want to delete {author.FirstName} {author.LastName}?");
+        if(confirm == true)
+        {            
+            var response = await _authorService.DeleteAuthor(id);
+            if (response.Success)
+                await OnInitializedAsync();
+        }        
+    }
+}

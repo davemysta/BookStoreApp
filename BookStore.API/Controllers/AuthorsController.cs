@@ -61,7 +61,9 @@ namespace BookStore.API.Controllers
             _logger.LogInformation($"GET request made to {nameof(GetAuthor)}");
             try
             {
-                var author = await _context.Authors.FindAsync(id);
+                var author = await _context.Authors
+                    .Include(q => q.Books)
+                    .FirstOrDefaultAsync(q => q.Id == id);
                 if (author == null)
                 {
                     _logger.LogWarning($"Record not found: {nameof(GetAuthor)} - ID: {id}");
@@ -70,9 +72,18 @@ namespace BookStore.API.Controllers
 
                 var authorDTO = new AuthorDTO
                 {
+                    Id = author.Id,
                     FirstName = author.FirstName ?? string.Empty,
                     LastName = author.LastName ?? string.Empty,
-                    Bio = author.Bio ?? string.Empty
+                    Bio = author.Bio ?? string.Empty,
+                    Books = author.Books.Select(book => new BookListItemDTO
+                    {
+                        Id = book.Id,
+                        Title = book.Title ?? string.Empty,
+                        Image = book.Image ?? string.Empty,
+                        Price = book.Price
+
+                    }).ToList(),
                 };
 
                 return Ok(authorDTO);
@@ -109,6 +120,8 @@ namespace BookStore.API.Controllers
             author.FirstName = authorDTO.FirstName ?? string.Empty;
             author.LastName = authorDTO.LastName ?? string.Empty;
             author.Bio = authorDTO.Bio ?? string.Empty;
+            author.Books = null;
+            
 
             _context.Entry(author).State = EntityState.Modified;
 
@@ -145,12 +158,13 @@ namespace BookStore.API.Controllers
                 {
                     FirstName = authorDTO.FirstName,
                     LastName = authorDTO.LastName,
-                    Bio = authorDTO.Bio
+                    Bio = authorDTO.Bio,
+                    Books = null
                 };
                 await _context.Authors.AddAsync(author);
                 await _context.SaveChangesAsync();
 
-                return CreatedAtAction(nameof(GetAuthor), new { id = author.Id }, author);
+                return Ok(CreatedAtAction(nameof(GetAuthor), new { id = author.Id }, author));
             }
             catch (Exception ex)
             {
@@ -177,7 +191,7 @@ namespace BookStore.API.Controllers
                 _context.Authors.Remove(author);
                 await _context.SaveChangesAsync();
 
-                return NoContent();
+                return Ok();
             }
             catch (Exception ex) 
             {

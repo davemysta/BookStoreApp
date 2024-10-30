@@ -1,0 +1,63 @@
+﻿@page "/authors/edit/{id:int}"
+@inject IAuthorService _authorService
+@inject NavigationManager _navManager
+@attribute [Authorize(Roles = Roles.Administrator)]
+
+<h3>Edit Author</h3>
+
+<EditForm Model="Author" OnValidSubmit="HandleEditAuthor" FormName="AuthorEditForm">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="form-group">
+        <label for="firstName">First Name</label>
+        <InputText id="firstName" @bind-Value="Author.FirstName" class="form-control" />
+        <ValidationMessage For="@(() => Author.FirstName)" />
+    </div>
+    <br />
+    <div class="form-group">
+        <label for="lastName">Name</label>
+        <InputText id="lastName" @bind-Value="Author.LastName" class="form-control" />
+        <ValidationMessage For="@(() => Author.LastName)" />
+    </div>
+    <br />
+    <div class="form-group">
+        <label for="bio">Name</label>
+        <InputTextArea id="bio" @bind-Value="Author.Bio" class="form-control" />
+        <ValidationMessage For="@(() => Author.Bio)" />
+    </div>
+    <br />
+    <button class="btn btn-primary" type="submit">
+        Edit Author
+    </button>
+    <button class="btn btn-outline-secondary" @onclick="BackToList" type="button">
+        <i class="bi bi-media-skip-backward"></i> Back to List
+    </button>
+</EditForm>
+
+@code {
+    [Parameter]
+    public int id { get; set; }
+    private AuthorDTO Author = new AuthorDTO();
+
+    protected async override Task OnInitializedAsync()
+    {
+        var response = await _authorService.GetAuthor(id);
+
+        if (response.Success)
+            Author = response.Data;
+    }
+
+    private async Task HandleEditAuthor()
+    {
+        var response = await _authorService.EditAuthor(id, Author);
+
+        if (response.Success == true)
+            BackToList();
+    }
+
+    private void BackToList()
+    {
+        _navManager.NavigateTo("/authors/");
+    }
+}

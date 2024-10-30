@@ -9,14 +9,16 @@ namespace BookStore.API.Data.DTOs
         public int Id { get; set; }
 
         [Required]
-        [StringLength(50)]
+        [MaxLength(50)]
         public string FirstName { get; set; }
 
         [Required]
-        [StringLength(50)]
+        [MaxLength(50)]
         public string LastName { get; set; }
 
-        [StringLength(250)]
+        [MaxLength(500)]
         public string Bio { get; set; }
+
+        public List<BookListItemDTO>? Books { get; set; }
     }
 }

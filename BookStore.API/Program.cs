@@ -37,8 +37,8 @@ builder.Services.AddCors(options =>
     options.AddPolicy(name: "DevCorsPolicy", policy =>
     {
         policy.WithOrigins(
-            "https://localhost:1111",
-            "http://localhost:1111"
+            "https://localhost:7035",
+            "http://localhost:5167"
             )
         .AllowAnyHeader()
         .AllowAnyMethod();
@@ -74,6 +74,7 @@ if (app.Environment.IsDevelopment())
 app.UseSerilogRequestLogging();
 
 app.UseHttpsRedirection();
+app.UseStaticFiles();
 
 app.UseCors("DevCorsPolicy");
 

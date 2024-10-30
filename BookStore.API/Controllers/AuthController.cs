@@ -69,7 +69,7 @@ namespace BookStore.API.Controllers
                     return BadRequest(ModelState);
                 }
 
-                return Accepted();
+                return Ok();
             }
             catch (Exception ex)
             {
@@ -104,7 +104,7 @@ namespace BookStore.API.Controllers
                     UserName = user.UserName
                 };
 
-                return Accepted(response);
+                return Ok(response);
 
             }
             catch (Exception ex)
@@ -121,7 +121,6 @@ namespace BookStore.API.Controllers
 
             var roles = await _userManager.GetRolesAsync(user);
             var roleClaims = roles.Select(q => new Claim(ClaimTypes.Role, q)).ToList();
-
             var userClaims = await _userManager.GetClaimsAsync(user);
 
             var claims = new List<Claim>

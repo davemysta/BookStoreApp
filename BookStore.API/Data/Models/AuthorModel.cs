@@ -13,5 +13,5 @@ public partial class AuthorModel
 
     public string? Bio { get; set; }
 
-    public virtual ICollection<BookModel> Books { get; set; } = new List<BookModel>();
+    public virtual ICollection<BookModel>? Books { get; set; } = new List<BookModel>();
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace BookStore.API.Data.Models;
 
@@ -14,7 +15,8 @@ public partial class BookModel
     public string Isbn { get; set; } = null!;
 
     public string? Summary { get; set; }
-
+    
+    [StringLength(250)]
     public string? Image { get; set; }
 
     public decimal Price { get; set; }

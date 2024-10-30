@@ -48,7 +48,7 @@ public partial class BookStoreDbContext : IdentityDbContext<ApiUser>
             entity.HasIndex(e => e.Isbn, "UQ__Books__447D36EA87CE7FFF").IsUnique();
 
             entity.Property(e => e.Image)
-                .HasMaxLength(50)
+                .HasMaxLength(250)
                 .IsFixedLength();
             entity.Property(e => e.Isbn)
                 .HasMaxLength(50)

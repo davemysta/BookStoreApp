@@ -22,11 +22,16 @@ namespace BookStore.API.Controllers
     {
         private readonly BookStoreDbContext _context;
         private readonly ILogger<BooksController> _logger;
+        private readonly IWebHostEnvironment _webHostEnvironment;
 
-        public BooksController(BookStoreDbContext context, ILogger<BooksController> logger)
+        public BooksController(
+            BookStoreDbContext context, 
+            ILogger<BooksController> logger,
+            IWebHostEnvironment webHostEnvironment)
         {
             _context = context;
             _logger = logger;
+            _webHostEnvironment = webHostEnvironment;
         }
 
         // GET: api/Books
@@ -44,8 +49,7 @@ namespace BookStore.API.Controllers
                     Image = book.Image,
                     Price = book.Price,
                     AuthorId = book.Author?.Id,
-                    AuthorName = book.Author?.FirstName
-
+                    AuthorName = $"{book.Author?.FirstName} {book.Author?.LastName}"
                 }).ToList();
                 return Ok(bookDTOs);
             }
@@ -64,7 +68,7 @@ namespace BookStore.API.Controllers
             _logger.LogInformation($"GET request made to {nameof(GetBook)}");
             try
             {
-                var book = await _context.Books.FirstOrDefaultAsync(b => b.Id == id);
+                var book = await _context.Books.Include(q => q.Author).FirstOrDefaultAsync(b => b.Id == id);
                 if (book == null)
                 {
                     return NotFound();
@@ -77,8 +81,10 @@ namespace BookStore.API.Controllers
                     Year = book.Year,
                     Isbn = book.Isbn,
                     Summary = book.Summary,
-                    Image = book.Image,
+                    ImageData = book.Image,
                     Price = book.Price,
+                    AuthorId = book.Author?.Id,
+                    AuthorName = $"{book.Author?.FirstName} {book.Author?.LastName}"
                 };
 
                 return bookDto;
@@ -112,11 +118,18 @@ namespace BookStore.API.Controllers
                 return NotFound();
             }
 
+            string oldImg = null;
+
+            if (bookDTO.OriginalImageName != null)
+            {
+                oldImg = book.Image ?? string.Empty;
+                book.Image = CreateFile(bookDTO.ImageData, bookDTO.OriginalImageName);
+            }
+
             book.Title = bookDTO.Title;
             book.Year = bookDTO.Year;
             book.Isbn = bookDTO.Isbn;
             book.Summary = bookDTO.Summary;
-            book.Image = bookDTO.Image;
             book.Price = bookDTO.Price;
 
 
@@ -125,6 +138,9 @@ namespace BookStore.API.Controllers
             try
             {
                 await _context.SaveChangesAsync();
+
+                if (oldImg != null)
+                    RemoveFile(oldImg);
             }
             catch (DbUpdateConcurrencyException ex)
             {
@@ -157,10 +173,12 @@ namespace BookStore.API.Controllers
                     Year = bookDTO.Year,
                     Isbn = bookDTO.Isbn,
                     Summary = bookDTO.Summary,
-                    Image = bookDTO.Image,
+                    Image = CreateFile(bookDTO.ImageData, bookDTO.OriginalImageName),
                     Price = bookDTO.Price,
+                    AuthorId = bookDTO.AuthorId
                 };
 
+                
                 await _context.Books.AddAsync(book);
                 await _context.SaveChangesAsync();
 
@@ -203,6 +221,34 @@ namespace BookStore.API.Controllers
         private async Task<bool> BookExists(int id)
         {
             return await _context.Books.AnyAsync(e => e.Id == id);
+        }
+    
+        private string CreateFile(string imageBase64, string imageName)
+        {
+            var url = HttpContext.Request.Host.Value;
+            var ext = Path.GetExtension(imageName);
+            var fileName = $"{Guid.NewGuid().ToString()}{ext}";
+
+            var path = $"{_webHostEnvironment.WebRootPath}\\bookcoverimages\\{fileName}";
+
+            byte[] image = Convert.FromBase64String(imageBase64);
+
+            var fileStream = System.IO.File.Create(path);
+            fileStream.Write(image, 0, image.Length);
+            fileStream.Close();
+
+            return $"https://{url}/bookcoverimages/{fileName}";
+        }
+        
+        private void RemoveFile(string img)
+        {
+            var picName = Path.GetFileName(img);
+            var path = $"{_webHostEnvironment.WebRootPath}\\bookcoverimages\\picName";
+
+            if (System.IO.File.Exists(path))
+            {
+                System.IO.File.Delete(path);
+            }
         }
     }
 }
